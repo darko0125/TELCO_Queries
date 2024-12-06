@@ -1,0 +1,127 @@
+--twilio_gbr query (wp.idWebPublisher = 53):
+WITH not_found AS (
+  SELECT 
+    cast(tugbcr.parent_call_sid AS string) AS call_id,
+    tugbcr.direction AS call_type,
+    tugbcr.status AS call_status,
+    tugbcr.from AS caller_number,
+    -- Mapping for dialed_number
+    CAST(
+      CASE 
+        WHEN tugbcr.forwarded_from IS NOT NULL THEN tugbcr.forwarded_from 
+        ELSE tugbcr.to 
+      END AS STRING
+    ) AS dialed_number,
+  
+    -- Mapping for target_number
+    CAST(
+    CASE 
+        WHEN tugbcr.forwarded_from IS NOT NULL THEN tugbcr.to 
+        ELSE NULL 
+    END AS STRING
+    ) AS target_number,
+    tugbcr.caller_name AS caller_name,
+    NULL AS caller_city,
+    NULL AS caller_state,
+    NULL AS caller_zip,
+    NULL AS caller_country,
+    NULL AS caller_address,
+    NULL AS attribution_source,
+    TIMESTAMP(tugbcr.start_time) AS start_time,
+    CAST(tugbcr.duration AS STRING) AS duration,
+    CAST(CURRENT_TIME() AS STRING) AS created_on,
+    CAST(CURRENT_TIME() AS STRING) AS updated_on,
+    tugbcr.mailbox_url AS mailbox_url,
+    NULL AS call_page_info,
+    NULL AS call_page_geo_keyword_id
+  FROM `dms-data-lake-development.twilio_gbr.calls_report` tugbcr
+  LEFT JOIN `localiq-dms-analytics-v2-prod.rl_cts.DniGroup` dg
+    ON tugbcr.group_sid = CAST(dg.publisher_group_id AS STRING)
+  WHERE DATE(start_time) > '2020-01-01'
+    AND (dg.idDniGroup IS NULL OR tugbcr.group_sid IS NULL)
+)
+SELECT
+  n.call_id,
+  n.call_type,
+  n.call_status,
+  n.caller_number,
+  n.dialed_number,
+  n.target_number,
+  n.caller_name,
+  n.caller_city,
+  n.caller_state,
+  n.caller_zip,
+  n.caller_country,
+  n.caller_address,
+  n.attribution_source,
+  n.start_time,
+  n.duration,
+  n.created_on,
+  n.updated_on,
+  n.mailbox_url,
+  n.call_page_info,
+  n.call_page_geo_keyword_id
+FROM not_found n
+INNER JOIN 
+  `localiq-dms-analytics-v2-prod.rl_cts.TrackingNumber` t
+ON CAST(n.dialed_number AS string) = t.tracking_number AND DATE(start_time) > '2020-01-01'
+
+UNION ALL
+
+SELECT 
+    cast(tugbcr.parent_call_sid AS string) AS call_id,
+    tugbcr.direction AS call_type,
+    tugbcr.status AS call_status,
+    tugbcr.from AS caller_number,
+    -- Mapping for dialed_number
+    CAST(
+      CASE 
+        WHEN tugbcr.forwarded_from IS NOT NULL THEN tugbcr.forwarded_from 
+        ELSE tugbcr.to 
+      END AS STRING
+    ) AS dialed_number,
+  
+    -- Mapping for target_number
+    CAST(
+    CASE 
+        WHEN tugbcr.forwarded_from IS NOT NULL THEN tugbcr.to 
+        ELSE NULL 
+    END AS STRING
+    ) AS target_number,
+    tugbcr.caller_name AS caller_name,
+    NULL AS caller_city,
+    NULL AS caller_state,
+    NULL AS caller_zip,
+    NULL AS caller_country,
+    NULL AS caller_address,
+    NULL AS attribution_source,
+    TIMESTAMP(tugbcr.start_time) AS start_time,
+    CAST(tugbcr.duration AS STRING) AS duration,
+    CAST(CURRENT_TIME() AS STRING) AS created_on,
+    CAST(CURRENT_TIME() AS STRING) AS updated_on,
+    tugbcr.mailbox_url AS mailbox_url,
+    NULL AS call_page_info,
+    NULL AS call_page_geo_keyword_id
+FROM dms-data-lake-development.twilio_gbr.calls_report tugbcr
+INNER JOIN 
+  `localiq-dms-analytics-v2-prod.rl_cts.DniGroup` dg
+ON tugbcr.group_sid = CAST(dg.publisher_group_id AS STRING)
+JOIN
+  `localiq-dms-analytics-v2-prod.ca_op.WebPublisherCampaign` wpc
+ON dg.WebPublisherCampaign_idWebPublisherCampaign_FK = wpc.idWebPublisherCampaign
+JOIN
+  `localiq-dms-analytics-v2-prod.ca_op.SubCampaign` sc
+ON wpc.SubCampaign_idSubCampaign_FK = sc.idSubCampaign
+JOIN 
+  `localiq-dms-analytics-v2-prod.ca_op.WebPublisher` wp 
+ON sc.WebPublisher_idWebPublisher_FK = wp.idWebPublisher
+JOIN
+  `localiq-dms-analytics-v2-prod.ca_op.Campaign` c
+ON sc.Campaign_idCampaign_FK = c.idCampaign
+JOIN
+  `localiq-dms-analytics-v2-prod.ca_op.Campaign` mc
+ON c.Campaign_idCampaign_Master_FK = mc.idCampaign
+JOIN
+  `localiq-dms-analytics-v2-prod.ca_op.Advertiser` a
+ON c.Advertiser_idAdvertiser_FK = a.idAdvertiser
+WHERE DATE(tugbcr.start_time) > '2020-01-01' 

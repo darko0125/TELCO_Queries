@@ -1,0 +1,109 @@
+--Marchex_ARS query (wp.idWebPublisher = 2135) :
+with not_found as (
+select cast(macr.id as string) AS call_id,
+macr.status AS call_type,
+macr.answer_status AS call_status,
+macr.caller_number AS caller_number,
+-- cast(macr.tracking_number as string) AS tracking_number,
+cast(macr.tracking_number as string) AS dialed_number,
+macr.termination_number AS target_number,
+macr.caller_details_name as caller_name,
+macr.caller_details_city as caller_city,
+macr.caller_details_state as caller_state,
+macr.caller_details_zip_code as caller_zip,
+macr.caller_details_country as caller_country,
+macr.caller_details_address as caller_address,
+TIMESTAMP(macr.start_time_utc) AS start_time,
+CAST(macr.call_duration as string) AS duration,
+CAST(CURRENT_TIME() AS STRING) AS created_on,
+CAST(CURRENT_TIME() AS STRING) AS updated_on,
+macr.conversation_analytics_voice_link as mailbox_url,
+macr.attribution_details_landing_page_url as call_page_info,
+NULL as call_page_geo_keyword_id
+FROM `dms-data-lake-development.marchex_ars.calls_report` macr
+left JOIN 
+  `localiq-dms-analytics-v2-prod.rl_cts.DniGroup` dg
+ON macr.group_id = dg.publisher_group_id
+WHERE macr.start_time_utc > TIMESTAMP("2020-01-01") 
+and (dg.idDniGroup is null
+or macr.group_id is null)
+)
+SELECT 
+n.call_id,
+n.call_type,
+n.call_status,
+n.caller_number,
+n.target_number,
+-- n.tracking_number,
+n.dialed_number,
+n.caller_name,
+n.caller_city,
+n.caller_state,
+n.caller_zip,
+n.caller_country,
+n.caller_address,
+n.start_time,
+n.duration,
+n.created_on,
+n.updated_on,
+n.mailbox_url,
+n.call_page_info,
+NULL as call_page_geo_keyword_id
+-- wpc.idWebPublisherCampaign as wpc_id,
+-- c.Campaign_idCampaign_Master_FK as MCID,
+-- a.Advertiser_idAdvertiser_Master_FK as MAID,
+-- c.idCampaign AS CID,
+-- NULL as attribution_source,
+-- 2135 AS webpublisher_id,
+-- 'Marchex Ars' as publisher
+FROM not_found n
+INNER JOIN 
+  `localiq-dms-analytics-v2-prod.rl_cts.TrackingNumber` t
+ON cast(n.dialed_number as string) = t.tracking_number and DATE(start_time) > '2020-01-01'
+-- JOIN
+--   `localiq-dms-analytics-v2-prod.rl_op.WebPublisherCampaign` wpc
+-- ON dg.WebPublisherCampaign_idWebPublisherCampaign_FK = wpc.idWebPublisherCampaign
+-- JOIN
+--   `localiq-dms-analytics-v2-prod.rl_op.SubCampaign` sc
+-- ON
+--   wpc.SubCampaign_idSubCampaign_FK = sc.idSubCampaign
+-- JOIN 
+--   `localiq-dms-analytics-v2-prod.rl_op.WebPublisher` wp 
+-- ON 
+--   sc.WebPublisher_idWebPublisher_FK = wp.idWebPublisher
+-- JOIN
+--   `localiq-dms-analytics-v2-prod.rl_op.Campaign` c
+-- ON
+--   sc.Campaign_idCampaign_FK = c.idCampaign
+-- JOIN
+--   `localiq-dms-analytics-v2-prod.rl_op.Campaign` mc
+-- ON
+--   c.Campaign_idCampaign_Master_FK = mc.idCampaign
+-- JOIN
+--   `localiq-dms-analytics-v2-prod.rl_op.Advertiser` a
+-- ON
+--   c.Advertiser_idAdvertiser_FK = a.idAdvertiser 
+UNION ALL
+SELECT cast(macr.id as string) AS call_id,
+macr.status AS call_type,
+macr.answer_status AS call_status,
+macr.caller_number AS caller_number,
+cast(macr.tracking_number as string) as dialed_number,
+macr.termination_number AS target_number,
+macr.caller_details_name as caller_name,
+macr.caller_details_city as caller_city,
+macr.caller_details_state as caller_state,
+macr.caller_details_zip_code as caller_zip,
+macr.caller_details_country as caller_country,
+macr.caller_details_address as caller_address,
+TIMESTAMP(macr.start_time_utc) AS start_time,
+CAST(macr.call_duration as string) AS duration,
+CAST(CURRENT_TIME() AS STRING) AS created_on,
+CAST(CURRENT_TIME() AS STRING) AS updated_on,
+macr.conversation_analytics_voice_link as mailbox_url,
+macr.attribution_details_landing_page_url as call_page_info,
+NULL as call_page_geo_keyword_id
+FROM `dms-data-lake-development.marchex_ars.calls_report` macr
+inner join `localiq-dms-analytics-v2-prod.rl_cts.DniGroup` g
+on macr.group_id = g.publisher_group_id
+WHERE macr.start_time_utc > TIMESTAMP('2020-01-01')
