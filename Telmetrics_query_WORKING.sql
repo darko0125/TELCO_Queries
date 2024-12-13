@@ -216,5 +216,5 @@ SELECT
 FROM 
   not_found n
 LEFT JOIN CTE_UNION cu
-ON n.target_number = CAST(cu.publisher_group_id AS STRING)
-WHERE cu.publisher_group_id IS NULL;
+ON n.target_number = CAST(cu.tracking_number AS STRING)
+WHERE cu.tracking_number IS NULL;
