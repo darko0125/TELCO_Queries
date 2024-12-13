@@ -1,4 +1,253 @@
-WITH not_found AS (
+WITH CTE_UNION as (
+select 
+acc.id,
+acc.account_uuid,
+acc.customer_code,
+acc.advertiser_name,
+acc.provider_id,
+NULL as tracking_uuid,
+acc.advertiser_address_id,
+NULL as idDniGroup,
+NULL as publisher_group_id,
+NULL as WebPublisher_idWebPublisher_FK,
+NULL as Campaign_idCampaign_Master_FK,
+NULL as WebPublisherCampaign_idWebPublisherCampaign_FK,
+acc.master_advertiser_id,
+'NULL' as tracking_javascript,
+'NULL' as country,
+'NULL' as status,
+DATE(acc.created_on) as created_on,
+acc.updated_on,
+acc.datastream_metadata.uuid,
+acc.datastream_metadata.source_timestamp,
+NULL as original_number,
+NULL as target_number,
+NULL AS tracking_number,
+NULL AS number_type,
+NULL AS initial_number_type,
+NULL AS number_match,
+NULL AS campaign_type,
+NULL AS referrer_type,
+NULL AS call_recording,
+NULL AS whisper,
+NULL AS site_id,
+NULL AS location_id,
+NULL AS location_uri,
+NULL AS error_messages,
+NULL AS is_legacy,
+NULL AS is_match,
+NULL AS remarks,
+NULL AS auto_delete_status,
+NULL AS call_verify,
+NULL AS call_verify_notification_text,
+NULL AS advertiser_business_name,
+NULL AS source,
+NULL AS name,
+NULL AS description,
+NULL AS web_publisher_id
+from `localiq-dms-analytics-v2-prod.rl_cts.Account` acc
+
+UNION ALL
+
+select
+NULL as id,
+'NULL' as account_uuid,
+'NULL' as customer_code,
+'NULL' as advertiser_name,
+NULL as provider_id,
+NULL tracking_uuid,
+NULL as advertiser_address_id,
+dg.idDniGroup,
+dg.publisher_group_id,
+dg.WebPublisher_idWebPublisher_FK,
+dg.Campaign_idCampaign_Master_FK,
+dg.WebPublisherCampaign_idWebPublisherCampaign_FK,
+dg.master_advertiser_id,
+dg.tracking_javascript,
+dg.country,
+dg.status,
+DATE(dg.created_time) as created_on,
+NULL as updated_on,
+datastream_metadata.uuid,
+datastream_metadata.source_timestamp,
+NULL as original_number,
+NULL as target_number,
+NULL AS tracking_number,
+NULL AS number_type,
+NULL AS initial_number_type,
+NULL AS number_match,
+NULL AS campaign_type,
+NULL AS referrer_type,
+NULL AS call_recording,
+NULL AS whisper,
+NULL AS site_id,
+NULL AS location_id,
+NULL AS location_uri,
+NULL AS error_messages,
+NULL AS is_legacy,
+NULL AS is_match,
+NULL AS remarks,
+NULL AS auto_delete_status,
+NULL AS call_verify,
+NULL AS call_verify_notification_text,
+NULL AS advertiser_business_name,
+NULL AS source,
+NULL AS name,
+NULL AS description,
+NULL AS web_publisher_id
+from `localiq-dms-analytics-v2-prod.rl_cts.DniGroup` dg
+
+UNION ALL
+
+select
+tn.id,
+CAST(tn.account_id AS STRING) as account_uuid,
+'NULL' AS customer_code,
+'NULL' as advertiser_name,
+NULL AS provider_id,
+tn.tracking_uuid,
+tn.advertiser_address_id,
+NULL as idDniGroup,
+NULL as publisher_group_id,
+NULL as WebPublisher_idWebPublisher_FK,
+tn.master_campaign_id as Campaign_idCampaign_Master_FK,
+tn.webpublisher_campaign_id as WebPublisherCampaign_idWebPublisherCampaign_FK,
+tn.master_advertiser_id,
+NULL as tracking_javascript,
+tn.country,
+CAST(tn.status_id as string) as status,
+DATE(tn.created_on) as created_on,
+DATE(tn.updated_on) as updated_on,
+datastream_metadata.uuid,
+datastream_metadata.source_timestamp,
+tn.original_number,
+NULL as target_number,
+NULL AS tracking_number,
+NULL AS number_type,
+NULL AS initial_number_type,
+NULL AS number_match,
+NULL AS campaign_type,
+NULL AS referrer_type,
+NULL AS call_recording,
+NULL AS whisper,
+NULL AS site_id,
+NULL AS location_id,
+NULL AS location_uri,
+NULL AS error_messages,
+NULL AS is_legacy,
+NULL AS is_match,
+NULL AS remarks,
+NULL AS auto_delete_status,
+NULL AS call_verify,
+NULL AS call_verify_notification_text,
+NULL AS advertiser_business_name,
+NULL AS source,
+NULL AS name,
+NULL AS description,
+NULL AS web_publisher_id
+from `localiq-dms-analytics-v2-prod.rl_cts.TrackingNumber` tn
+
+UNION ALL
+
+SELECT 
+tp.id,
+'NULL' as account_uuid,
+'NULL' as customer_code,
+'NULL' as advertiser_name,
+NUll as provider_id,
+NULL as tracking_uuid,
+NULL as advertiser_address_id,
+NULL as idDniGroup,
+NULL as publisher_group_id,
+NULL as WebPublisher_idWebPublisher_FK,
+NULL as Campaign_idCampaign_Master_FK,
+NULL as WebPublisherCampaign_idWebPublisherCampaign_FK,
+NULL as master_advertiser_id,
+NULL as tracking_javascript,
+NULL as country,
+NULL as status,
+DATE(tp.created_on) as created_on,
+DATE(tp.updated_on) as updated_on,
+datastream_metadata.uuid,
+datastream_metadata.source_timestamp,
+NULL as original_number,
+NULL as target_number,
+NULL AS tracking_number,
+NULL AS number_type,
+NULL AS initial_number_type,
+NULL AS number_match,
+NULL AS campaign_type,
+NULL AS referrer_type,
+NULL AS call_recording,
+NULL AS whisper,
+NULL AS site_id,
+NULL AS location_id,
+NULL AS location_uri,
+NULL AS error_messages,
+NULL AS is_legacy,
+NULL AS is_match,
+NULL AS remarks,
+NULL AS auto_delete_status,
+NULL AS call_verify,
+NULL AS call_verify_notification_text,
+NULL AS advertiser_business_name,
+NULL AS source,
+NULL AS name,
+NULL AS description,
+tp.webpublisher_id as web_publisher_id
+from `localiq-dms-analytics-v2-prod.rl_cts.TrackingProvider` tp 
+
+UNION ALL
+
+SELECT
+id,
+'NULL' as account_uuid,
+'NULL' as customer_code,
+'NULL' as advertiser_name,
+NULL as provider_id,
+NULL tracking_uuid,
+NULL as advertiser_address_id,
+NULL as idDniGroup,
+NULL as publisher_group_id,
+NULL as WebPublisher_idWebPublisher_FK,
+NULL as Campaign_idCampaign_Master_FK,
+NULL as WebPublisherCampaign_idWebPublisherCampaign_FK,
+NULL as master_advertiser_id,
+NULL as tracking_javascript,
+NULL as country,
+NULL as status,
+DATE(ts.created_on) as created_on,
+DATE(ts.updated_on) as updated_on,
+datastream_metadata.uuid,
+datastream_metadata.source_timestamp,
+NULL as original_number,
+NULL as target_number,
+NULL AS tracking_number,
+NULL AS number_type,
+NULL AS initial_number_type,
+NULL AS number_match,
+NULL AS campaign_type,
+NULL AS referrer_type,
+NULL AS call_recording,
+NULL AS whisper,
+NULL AS site_id,
+NULL AS location_id,
+NULL AS location_uri,
+NULL AS error_messages,
+NULL AS is_legacy,
+NULL AS is_match,
+NULL AS remarks,
+NULL AS auto_delete_status,
+NULL AS call_verify,
+NULL AS call_verify_notification_text,
+NULL AS advertiser_business_name,
+NULL AS source,
+ts.name as name,
+ts.description as description,
+NULL as web_publisher_id
+from `localiq-dms-analytics-v2-prod.rl_cts.TrackingStatus` ts
+),
+not_found AS (
   -- Step 1: Find records that didn't match DniGroup
   SELECT CAST(tmcr.id AS STRING) AS call_id,
          tmcr.status AS call_type,
@@ -25,73 +274,11 @@ WITH not_found AS (
   FROM `dms-data-lake-development.telmetrics.calls_report` tmcr
   LEFT JOIN `localiq-dms-analytics-v2-prod.rl_cts.DniGroup` g
     ON tmcr.group_id = g.publisher_group_id
-  WHERE TIMESTAMP_TRUNC(TIMESTAMP(DATETIME(tmcr.start_time_utc), 'UTC'), DAY) > TIMESTAMP("2024-08-01")
+  WHERE TIMESTAMP_TRUNC(TIMESTAMP(DATETIME(tmcr.start_time_utc), 'UTC'), DAY) > TIMESTAMP("2020-01-01")
     AND (g.idDniGroup IS NULL OR tmcr.group_id IS NULL)
 )
 SELECT 
-  wpc.idWebPublisherCampaign AS wpc_id,
-  c.Campaign_idCampaign_Master_FK AS MCID,
-  a.Advertiser_idAdvertiser_Master_FK AS MAID,
-  c.idCampaign AS CID,
-  45 AS webpublisher_id,
-  'Telmetrics' AS publisher,
-  CAST(tmcr.id AS STRING) AS call_id,
-  tmcr.status AS call_type,
-  tmcr.answer_status AS call_status,
-  tmcr.caller_number AS caller_number,
-  CAST(tmcr.tracking_number AS STRING) AS dialed_number,
-  tmcr.termination_number AS target_number,
-  tmcr.caller_details_name AS caller_name,
-  tmcr.caller_details_city AS caller_city,
-  tmcr.caller_details_state AS caller_state,
-  tmcr.caller_details_zip_code AS caller_zip,
-  tmcr.caller_details_country AS caller_country,
-  tmcr.caller_details_address AS caller_address,
-  TIMESTAMP(DATETIME(tmcr.start_time_utc), 'UTC') AS start_time,  -- Cast to UTC TIMESTAMP
-  CAST(tmcr.call_duration AS STRING) AS duration,
-  CAST(CURRENT_TIME() AS STRING) AS created_on,
-  CAST(CURRENT_TIME() AS STRING) AS updated_on,
-  tmcr.conversation_analytics_voice_link AS mailbox_url,
-  tmcr.attribution_details_landing_page_url AS call_page_info,
-  NULL AS call_page_geo_keyword_id,
-  NULL AS attribution_source,
-  tmcr.tracking_number  -- Include needed columns from the `telmetrics.calls_report`
-FROM 
-  `dms-data-lake-development.telmetrics.calls_report` tmcr
-JOIN
-  `localiq-dms-analytics-v2-prod.rl_cts.DniGroup` dg
-  ON tmcr.group_id = dg.publisher_group_id
-JOIN
-  `localiq-dms-analytics-v2-prod.rl_op.WebPublisherCampaign` wpc
-  ON dg.WebPublisherCampaign_idWebPublisherCampaign_FK = wpc.idWebPublisherCampaign
-JOIN
-  `localiq-dms-analytics-v2-prod.rl_op.SubCampaign` sc
-  ON wpc.SubCampaign_idSubCampaign_FK = sc.idSubCampaign
-JOIN
-  `localiq-dms-analytics-v2-prod.rl_op.WebPublisher` wp 
-  ON sc.WebPublisher_idWebPublisher_FK = wp.idWebPublisher
-JOIN
-  `localiq-dms-analytics-v2-prod.rl_op.Campaign` c
-  ON sc.Campaign_idCampaign_FK = c.idCampaign
-JOIN
-  `localiq-dms-analytics-v2-prod.rl_op.Campaign` mc
-  ON c.Campaign_idCampaign_Master_FK = mc.idCampaign
-JOIN
-  `localiq-dms-analytics-v2-prod.rl_op.Advertiser` a
-  ON c.Advertiser_idAdvertiser_FK = a.idAdvertiser
-WHERE TIMESTAMP_TRUNC(TIMESTAMP(DATETIME(tmcr.start_time_utc), 'UTC'), DAY) > TIMESTAMP("2024-08-01")
-
-UNION ALL
-
--- Step 2: Join records that were not found in DniGroup with TrackingNumber
-SELECT 
-  wpc.idWebPublisherCampaign AS wpc_id,
-  c.Campaign_idCampaign_Master_FK AS MCID,
-  a.Advertiser_idAdvertiser_Master_FK AS MAID,
-  c.idCampaign AS CID,
-  45 AS webpublisher_id,
-  'Telmetrics' AS publisher,
-    n.call_id,
+  n.call_id,
   n.call_type,
   n.call_status,
   n.caller_number,
@@ -103,35 +290,17 @@ SELECT
   n.caller_zip,
   n.caller_country,
   n.caller_address,
+  n.attribution_source,
   n.start_time,
   n.duration,
   n.created_on,
   n.updated_on,
   n.mailbox_url,
   n.call_page_info,
-  n.call_page_geo_keyword_id,
-  n.attribution_source,
-  n.tracking_number
-FROM not_found n
-INNER JOIN `localiq-dms-analytics-v2-prod.rl_cts.TrackingNumber` t
-  ON n.tracking_number = t.tracking_number
-JOIN 
-  `localiq-dms-analytics-v2-prod.rl_op.WebPublisherCampaign` wpc
-  ON n.WebPublisherCampaign_idWebPublisherCampaign_FK = wpc.idWebPublisherCampaign  -- Now it exists
-JOIN
-  `localiq-dms-analytics-v2-prod.rl_op.SubCampaign` sc
-  ON wpc.SubCampaign_idSubCampaign_FK = sc.idSubCampaign
-JOIN
-  `localiq-dms-analytics-v2-prod.rl_op.WebPublisher` wp
-  ON sc.WebPublisher_idWebPublisher_FK = wp.idWebPublisher
-JOIN
-  `localiq-dms-analytics-v2-prod.rl_op.Campaign` c
-  ON sc.Campaign_idCampaign_FK = c.idCampaign
-JOIN
-  `localiq-dms-analytics-v2-prod.rl_op.Campaign` mc
-  ON c.Campaign_idCampaign_Master_FK = mc.idCampaign
-JOIN
-  `localiq-dms-analytics-v2-prod.rl_op.Advertiser` a
-  ON c.Advertiser_idAdvertiser_FK = a.idAdvertiser
-WHERE TIMESTAMP_TRUNC(TIMESTAMP(DATETIME(n.start_time), 'UTC'), DAY) > TIMESTAMP("2022-08-01") 
-  AND t.id IS NULL
+  n.call_page_geo_keyword_id
+
+FROM 
+  not_found n
+LEFT JOIN CTE_UNION cu
+ON n.target_number = CAST(cu.publisher_group_id AS STRING)
+WHERE cu.publisher_group_id IS NULL;
